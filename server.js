@@ -6,7 +6,7 @@ import http from 'http';
 import { hri } from 'human-readable-ids';
 import Router from 'koa-router';
 
-import ClientManager from './lib/ClientManager.js';
+import ClientManager from './lib/ClientManager';
 
 const debug = Debug('localtunnel:server');
 
@@ -29,6 +29,7 @@ export default function(opt) {
     const router = new Router();
 
     router.get('/api/status', async (ctx, next) => {
+		debug('API: /api/status');
         const stats = manager.stats;
         ctx.body = {
             tunnels: stats.tunnels,
@@ -37,6 +38,7 @@ export default function(opt) {
     });
 
     router.get('/api/tunnels/:id/status', async (ctx, next) => {
+		debug('API: /api/tunnels/:id/status');
         const clientId = ctx.params.id;
         const client = manager.getClient(clientId);
         if (!client) {
@@ -55,6 +57,7 @@ export default function(opt) {
 
     // root endpoint
     app.use(async (ctx, next) => {
+		debug('ROOT ENDPOINT: /');
         const path = ctx.request.path;
 
         // skip anything not on the root path
@@ -82,6 +85,7 @@ export default function(opt) {
     // anything after the / path is a request for a specific client name
     // This is a backwards compat feature
     app.use(async (ctx, next) => {
+		debug('ROOT BACKWARDS: /');
         const parts = ctx.request.path.split('/');
 
         // any request with several layers of paths is not allowed
@@ -106,6 +110,8 @@ export default function(opt) {
 
         debug('making new client with id %s', reqId);
         const info = await manager.newClient(reqId);
+		debug('ON.ROOT-DATA: ', reqId, info);
+		// debug('ON.ROOT-DATA-clients: ', manager.clients);
 
         const url = schema + '://' + info.id + '.' + ctx.request.host;
         info.url = url;
@@ -118,6 +124,7 @@ export default function(opt) {
     const appCallback = app.callback();
 
     server.on('request', (req, res) => {
+		debug('ON.REQUEST: /');
         // without a hostname, we won't know who the request is for
         const hostname = req.headers.host;
         if (!hostname) {
@@ -133,6 +140,8 @@ export default function(opt) {
         }
 
         const client = manager.getClient(clientId);
+		debug('ON.REQUEST-DATA: ', hostname, clientId, client);
+		// debug('ON.REQUEST-DATA.manager: ', manager.clients);
         if (!client) {
             res.statusCode = 404;
             res.end('404');
@@ -143,6 +152,7 @@ export default function(opt) {
     });
 
     server.on('upgrade', (req, socket, head) => {
+		debug('ON UPGRADE: /');
         const hostname = req.headers.host;
         if (!hostname) {
             socket.destroy();

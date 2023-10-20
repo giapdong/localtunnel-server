@@ -7,7 +7,9 @@ localtunnel exposes your localhost to the world for easy testing and sharing! No
 This repo is the server component. If you are just looking for the CLI localtunnel app, see (https://github.com/localtunnel/localtunnel).
 
 ## DEV
-NODE_ENV=development && node -r esm ./bin/server --port 12666
+NODE_ENV=development && node -r esm ./bin/server --port 12666 # Linux
+node ./bin/server --port 12666 #Windows
+
 
 
 ## overview ##
