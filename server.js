@@ -140,7 +140,7 @@ export default function(opt) {
         }
 
         const client = manager.getClient(clientId);
-		debug('ON.REQUEST-DATA: ', hostname, clientId, client);
+		debug('ON.REQUEST-DATA: ', hostname, clientId);
 		// debug('ON.REQUEST-DATA.manager: ', manager.clients);
         if (!client) {
             res.statusCode = 404;
