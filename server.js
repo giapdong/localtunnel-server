@@ -37,6 +37,21 @@ export default function(opt) {
         };
     });
 
+    router.get('/api/disconnect/:id', async (ctx, next) => {
+		const clientID = ctx.params.id
+		const secret = ctx.query.secret
+		debug('API: /api/disconnect ', clientID, ctx.query);
+
+		if (secret == process.env.MASTER_SECRET_KEY) {
+			if (manager.hasClient(clientID)) {
+				debug('Force disconnecting ', clientID);
+				manager.removeClient(clientID)
+			}
+		}
+
+        ctx.body = {}
+    });
+
     router.get('/api/tunnels/:id/status', async (ctx, next) => {
 		debug('API: /api/tunnels/:id/status');
         const clientId = ctx.params.id;
